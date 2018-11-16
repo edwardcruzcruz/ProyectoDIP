@@ -1,11 +1,10 @@
-#coding=utf-8
-
 #OpenCV module
 import cv2
 #Modulo para leer directorios y rutas de archivos
 import os
 #OpenCV trabaja con arreglos de numpy
 import numpy
+
 #Se importa la lista de personas con acceso al laboratorio
 from listaPermitidos import Politecnicos
 flabs=Politecnicos()
@@ -21,11 +20,15 @@ size = 4
 
 # Crear una lista de imagenes y una lista de nombres correspondientes
 (images, lables, names, id) = ([], [], {}, 0)
-for (subdirs, dirs, files) in os.walk(dir_faces):#walk () genera los nombres de los archivos en un árbol de directorios recorriendo el árbol de arriba hacia abajo o de abajo hacia arriba.
+for (subdirs, dirs, files) in os.walk(dir_faces):
+    # walk () genera los nombres de los archivos en un árbol de directorios
+    # recorriendo el árbol de arriba hacia abajo o de abajo hacia arriba.
     for subdir in dirs:
         names[id] = subdir
+        # une direcciones 'att_faces/orl_faces'+'edward'
         subjectpath = os.path.join(dir_faces, subdir)#une direcciones 'att_faces/orl_faces'+'edward'
-        for filename in os.listdir(subjectpath):#listdir retorna una lista que contiene los nombres de la entrada de un directorio dado por una ruta
+        # listdir retorna una lista que contiene los nombres de la entrada de un directorio dado por una ruta
+        for filename in os.listdir(subjectpath):
             path = subjectpath + '/' + filename
             lable = id
             images.append(cv2.imread(path, 0))
@@ -37,7 +40,7 @@ for (subdirs, dirs, files) in os.walk(dir_faces):#walk () genera los nombres de 
 (images, lables) = [numpy.array(lis) for lis in [images, lables]]
 
 # OpenCV entrena un modelo a partir de las imagenes
-model = cv2.face.LBPHFaceRecognizer_create()#
+model = cv2.face.LBPHFaceRecognizer_create()
 #or use EigenFaceRecognizer by replacing above line with 
 #face_recognizer = cv2.face.createEigenFaceRecognizer()
  
@@ -84,12 +87,12 @@ while True:
 
         #Si la prediccion tiene una exactitud menor a 100 se toma como prediccion valida
         if prediction[1]<100 :
-          #Ponemos el nombre de la persona que se reconoció
-          cv2.putText(frame,'%s - %.0f' % (cara,prediction[1]),(x-10, y-10), cv2.FONT_HERSHEY_PLAIN,1,(0, 255, 0))
+            #Ponemos el nombre de la persona que se reconoció
+            cv2.putText(frame,'%s - %.0f' % (cara,prediction[1]),(x-10, y-10), cv2.FONT_HERSHEY_PLAIN,1,(0, 255, 0))
 
-          #En caso de que la cara sea de algun conocido se realizara determinadas accione          
-          #Busca si los nombres de las personas reconocidas estan dentro de los que tienen acceso          
-          #flabs.TuSiTuNo(cara)
+            #En caso de que la cara sea de algun conocido se realizara determinadas accione          
+            #Busca si los nombres de las personas reconocidas estan dentro de los que tienen acceso          
+            #flabs.TuSiTuNo(cara)
 
         #Si la prediccion es mayor a 100 no es un reconomiento con la exactitud suficiente
         elif prediction[1]>101 and prediction[1]<500:           

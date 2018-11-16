@@ -5,7 +5,7 @@ import os
 img_width, img_height = 92,112
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 #eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
-folder = raw_input("Ingrese una carpeta de destino: ")
+folder = input("Ingrese una carpeta de destino: ")
 p = os.path.isdir('att_faces/orl_faces/'+folder)
 while not p:
 	print("Error al ingresar carpeta, ingrese de nuevo la carpeta o cree una en att_faces/orl_faces/<new folder>")
@@ -22,9 +22,9 @@ while(True):
 	gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 	for (x,y,w,h) in faces:
-    		img = cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-    		#roi_gray = gray[y:y+h, x:x+w]
-    		roi_color = img[y:y+h, x:x+w]
+		img = cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+		#roi_gray = gray[y:y+h, x:x+w]
+		roi_color = img[y:y+h, x:x+w]
 		face_resize = cv2.resize(roi_color, (img_width, img_height))		
 		cv2.imshow('VentanaROI',face_resize)
 		if cv2.waitKey(1) & 0xFF == ord('y'): #save on pressing 'y'
