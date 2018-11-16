@@ -52,58 +52,73 @@ model.train(images, lables)
 
 # Parte 2: Utilizar el modelo entrenado en funcionamiento con la camara
 face_cascade = cv2.CascadeClassifier( 'haarcascade_frontalface_default.xml')
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('media/anguloscaracamara2.2.webm')
 
+cont=0
 while True:
-    #leemos un frame y lo guardamos
+    #leemos un frame lo invertimos 90º y lo guardamos
     rval, frame = cap.read()
-    frame=cv2.flip(frame,1,0)
+    cont=cont+1
+    if rval and cont%15==0:
 
-    #convertimos la imagen a blanco y negro    
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # *** Esto para preprocesar captura de video en cámara MASHI 
+        rows, cols = frame.shape[:-1]
+        # rota la imagen 90ª en sentido antihoraio
+        m = cv2.getRotationMatrix2D(((cols-1)/2.0, (rows-1)/2.0), 90, 1)
+        frame = cv2.warpAffine(frame, m, (cols, rows))
+        #invierte la imagen con respecto al eje vertical
+        frame=cv2.flip(frame,1,0)
+        # se incrementa intensidad de brillo
+        #frame=cv2.add(frame,50)
+        # *** Hasta aquí preprocesamiento por el MASHI
 
-    #redimensionar la imagen
-    mini = cv2.resize(gray, (int(gray.shape[1] / size), int(gray.shape[0] / size)))
+        #convertimos la imagen a blanco y negro    
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    """buscamos las coordenadas de los rostros (si los hay) y
-   guardamos su posicion"""
-    faces = face_cascade.detectMultiScale(mini)
-    
-    for i in range(len(faces)):
-        face_i = faces[i]
-        (x, y, w, h) = [v * size for v in face_i]
-        face = gray[y:y + h, x:x + w]
-        face_resize = cv2.resize(face, (im_width, im_height))
+        #redimensionar la imagen
+        mini = cv2.resize(gray, (int(gray.shape[1] / size), int(gray.shape[0] / size)))
 
-        # Intentado reconocer la cara
-        prediction = model.predict(face_resize)
-        
-         #Dibujamos un rectangulo en las coordenadas del rostro
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
-        
-        # Escribiendo el nombre de la cara reconocida
-        # La variable cara tendra el nombre de la persona reconocida
-        cara = '%s' % (names[prediction[0]])
+        """buscamos las coordenadas de los rostros (si los hay) y
+        guardamos su posicion"""
+        faces = face_cascade.detectMultiScale(mini)
 
-        #Si la prediccion tiene una exactitud menor a 100 se toma como prediccion valida
-        if prediction[1]<100 :
-            #Ponemos el nombre de la persona que se reconoció
-            cv2.putText(frame,'%s - %.0f' % (cara,prediction[1]),(x-10, y-10), cv2.FONT_HERSHEY_PLAIN,1,(0, 255, 0))
+        for i in range(len(faces)):
+            face_i = faces[i]
+            (x, y, w, h) = [v * size for v in face_i]
+            face = gray[y:y + h, x:x + w]
+            face_resize = cv2.resize(face, (im_width, im_height))
 
-            #En caso de que la cara sea de algun conocido se realizara determinadas accione          
-            #Busca si los nombres de las personas reconocidas estan dentro de los que tienen acceso          
-            #flabs.TuSiTuNo(cara)
+            # Intentado reconocer la cara
+            prediction = model.predict(face_resize)
+            
+             #Dibujamos un rectangulo en las coordenadas del rostro
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
+            
+            # Escribiendo el nombre de la cara reconocida
+            # La variable cara tendra el nombre de la persona reconocida
+            cara = '%s' % (names[prediction[0]])
 
-        #Si la prediccion es mayor a 100 no es un reconomiento con la exactitud suficiente
-        elif prediction[1]>101 and prediction[1]<500:           
-            #Si la cara es desconocida, poner desconocido
-            cv2.putText(frame, 'Desconocido',(x-10, y-10), cv2.FONT_HERSHEY_PLAIN,1,(0, 255, 0))  
+            #Si la prediccion tiene una exactitud menor a 100 se toma como prediccion valida
+            if prediction[1]<100 :
+                #Ponemos el nombre de la persona que se reconoció
+                cv2.putText(frame,'%s - %.0f' % (cara,prediction[1]),(x-10, y-10), cv2.FONT_HERSHEY_PLAIN,1,(0, 255, 0))
 
-        #Mostramos la imagen
-        cv2.imshow('OpenCV Reconocimiento facial', frame)
+                #En caso de que la cara sea de algun conocido se realizara determinadas accione          
+                #Busca si los nombres de las personas reconocidas estan dentro de los que tienen acceso          
+                persona=cara.split('_') # Nombre de ejemplo en la lista: 'Bryan Tumbaco'
+                flabs.TuSiTuNo(persona[0].capitalize()+' '+persona[1].capitalize())
+
+            #Si la prediccion es mayor a 100 no es un reconomiento con la exactitud suficiente
+            elif prediction[1]>101 and prediction[1]<500:           
+                #Si la cara es desconocida, poner desconocido
+                cv2.putText(frame, 'Desconocido',(x-10, y-10), cv2.FONT_HERSHEY_PLAIN,1,(0, 255, 0))  
+
+            #Mostramos la imagen
+            cv2.imshow('OpenCV Reconocimiento facial', frame)
 
     #Si se presiona la tecla ESC se cierra el programa
     key = cv2.waitKey(10)
     if key == 27:
+        cap.release()
         cv2.destroyAllWindows()
         break
