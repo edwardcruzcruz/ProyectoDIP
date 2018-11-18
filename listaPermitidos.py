@@ -2,7 +2,7 @@ class Politecnicos:
     """ Lista de invitados a al labortorio CIDIS con el Mashi """
 
     def __init__(self):
-        self.Invitados=['Edward Cruz','Bryan Tumbaco']
+        self.Invitados=['Aedward Cruz','Bryan Tumbaco']
 
     def TuSiTuNo(self,EllosSi):        
         if EllosSi in self.Invitados:
