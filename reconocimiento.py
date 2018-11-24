@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #OpenCV module
 import cv2
 #Modulo para leer directorios y rutas de archivos
@@ -34,7 +36,7 @@ for (subdirs, dirs, files) in os.walk(dir_faces):
             images.append(cv2.imread(path, 0))
             lables.append(int(lable))
         id += 1
-(im_width, im_height) = (112, 92)
+(im_width, im_height) = (92, 112)
 
 # Crear una matriz Numpy de las dos listas anteriores
 (images, lables) = [np.array(lis) for lis in [images, lables]]
@@ -52,7 +54,7 @@ model.train(images, lables)
 
 # Parte 2: Utilizar el modelo entrenado en funcionamiento con la camara
 face_cascade = cv2.CascadeClassifier( 'haarcascade_frontalface_default.xml')
-cap = cv2.VideoCapture('media/anguloSCARACAMARA2.2.webm')
+cap = cv2.VideoCapture('media/prueba.webm')
 
 cont=0
 while True:
@@ -61,14 +63,12 @@ while True:
     cont=cont+1
     if rval:
 
-        # *** Esto para preprocesar captura de video en cámara MASHI 
+        # *** Esto para preprocesar captura de video de cámara MASHI 
         rows, cols = frame.shape[:-1]
         # rota la imagen 90ª en sentido antihoraio
         m = cv2.getRotationMatrix2D(((cols-1)/2.0, (rows-1)/2.0), 90, 1)
         frame = cv2.warpAffine(frame, m, (cols, rows))
 
-        # se incrementa intensidad de brillo
-        #frame=cv2.add(frame,50)
         # *** Hasta aquí preprocesamiento por el MASHI
 
         #invierte la imagen con respecto al eje vertical
@@ -82,18 +82,18 @@ while True:
         #table=np.array([( (i/255.0) ** (1.0/gamma) ) * 255
         #    for i in np.arange(0, 256) ]).astype("uint8")
         #gray=cv2.LUT(gray,table)
-        brightness=32
-        shadow=brightness
-        highlight=255
-        alpha=(highlight-shadow)/255
-        gamma=shadow
-        gray=cv2.addWeighted(gray, alpha, gray, 0, gamma)
+        #brightness=32
+        #shadow=brightness
+        #highlight=255
+        #alpha=(highlight-shadow)/255
+        #gamma=shadow
+        #gray=cv2.addWeighted(gray, alpha, gray, 0, gamma)
         
         #aumentamos el contraste
-        contrast=32
-        alpha = 131*(contrast + 127)/(127*(131-contrast))
-        gamma = 127*(1-alpha)
-        gray = cv2.addWeighted(gray, alpha, gray, 0, gamma)
+        #contrast=32
+        #alpha = 131*(contrast + 127)/(127*(131-contrast))
+        #gamma = 127*(1-alpha)
+        #gray = cv2.addWeighted(gray, alpha, gray, 0, gamma)
         
         #redimensionar la imagen
         mini = cv2.resize(gray, (int(gray.shape[1] / size), int(gray.shape[0] / size)))
@@ -119,7 +119,7 @@ while True:
             cara = '%s' % (names[prediction[0]])
 
             #Si la prediccion tiene una exactitud menor a 100 se toma como prediccion valida
-            if prediction[1]<100:
+            if prediction[1]<=100:
                 #Ponemos el nombre de la persona que se reconoció
                 cv2.putText(gray,'%s - %.0f' % (cara,prediction[1]),(x-10, y-10), cv2.FONT_HERSHEY_PLAIN,1,(0, 255, 0))
 
@@ -129,7 +129,7 @@ while True:
                 flabs.TuSiTuNo(persona[0].capitalize()+' '+persona[1].capitalize())
 
             #Si la prediccion es mayor a 100 no es un reconomiento con la exactitud suficiente
-            elif prediction[1]>101 and prediction[1]<500:           
+            elif prediction[1]>=101 and prediction[1]<500:           
                 #Si la cara es desconocida, poner desconocido
                 cv2.putText(gray, 'Desconocido',(x-10, y-10), cv2.FONT_HERSHEY_PLAIN,1,(0, 255, 0))  
 
