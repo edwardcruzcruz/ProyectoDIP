@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Autor: Kenneth Jiang
 # Post: Calibrate fishete lens using OpenCV
 # Obtenido en: https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
@@ -25,7 +27,7 @@ frame_gray = None
 
 objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
-
+cont =0
 images = glob.glob('*.jpg')
 for fname in images:
     img = cv2.imread(fname)
@@ -41,8 +43,10 @@ for fname in images:
 	    objpoints.append(objp)
 	    cv2.cornerSubPix(frame_gray,corners,(3,3),(-1,-1),subpix_criteria)
 	    imgpoints.append(corners)
-	    cv2.imshow("Imagen", frame_gray )
+	    cv2.imshow("Valid Images", frame_gray )
     cv2.waitKey(1)
+    cont = cont + 1
+    print(cont)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
@@ -79,9 +83,9 @@ print("K=np.array(" + K + ")\n")
 print("D=np.array(" + D + ")\n")
 
 archivo = open("variables_fisheye.txt","w")
-archivo.write("DIM:" + DIM + "\n" +
-		  "K:" + K + "\n" +
-		  "D:" +D)
+archivo.write("DIM=" + DIM + "\n" +
+		  "K=" + K + "\n" +
+		  "D=" +D)
 archivo.close()
 
 
