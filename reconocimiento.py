@@ -53,8 +53,7 @@ model.train(images, lables)
 
 # Parte 2: Utilizar el modelo entrenado en funcionamiento con la camara
 face_cascade = cv2.CascadeClassifier( 'haarcascade_frontalface_default.xml')
-cap = cv2.VideoCapture('media/prueba.webm')
-
+cap = cv2.VideoCapture('media/mejorado2.webm')
 #variables para correción del efecto ojo de pez obtenidas en la calibración
 DIM= (640, 480)
 K = np.array([[392.2587784103325, 0.0, 349.5946215390046], [0.0, 429.2697800524658, 219.08594079864957], [0.0, 0.0, 1.0]])

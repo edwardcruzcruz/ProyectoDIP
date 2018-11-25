@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import gamma as g #funcion de realzado de brillo
 import numpy as np
 import cv2
 import os
@@ -16,7 +16,8 @@ while not p:
 
 
 img_counter = 0
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("media/mejorado2.webm")
+#cap = cv2.VideoCapture(0)
 while(True):
 	cv2.namedWindow('Ventana', cv2.WINDOW_AUTOSIZE)
 	cv2.namedWindow('VentanaROI', cv2.WINDOW_AUTOSIZE)
@@ -27,7 +28,7 @@ while(True):
 		# rota la imagen 90ª en sentido antihoraio
 		m = cv2.getRotationMatrix2D(((cols-1)/2.0, (rows-1)/2.0), 90, 1)
 		img = cv2.warpAffine(img, m, (cols, rows))
-
+		img=g.adjust_gamma(img, gamma=1.5)
 		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 		faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 		for (x,y,w,h) in faces:
