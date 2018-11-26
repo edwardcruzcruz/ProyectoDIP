@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-#OpenCV module
 import cv2
 #Modulo para leer directorios y rutas de archivos
 import os
 #OpenCV trabaja con arreglos de numpy
 import numpy as np
+import undistort as ud
 
 #Se importa la lista de personas con acceso al laboratorio
 from listaPermitidos import Politecnicos
@@ -54,10 +54,6 @@ model.train(images, lables)
 # Parte 2: Utilizar el modelo entrenado en funcionamiento con la camara
 face_cascade = cv2.CascadeClassifier( 'haarcascade_frontalface_default.xml')
 cap = cv2.VideoCapture('media/mejorado2.webm')
-#variables para correción del efecto ojo de pez obtenidas en la calibración
-DIM= (640, 480)
-K = np.array([[392.2587784103325, 0.0, 349.5946215390046], [0.0, 429.2697800524658, 219.08594079864957], [0.0, 0.0, 1.0]])
-D= np.array([[-0.5947515245760245], [1.210686515239806], [-1.8039526380719182], [0.7464215045731002]])
 
 while True:
     #leemos un frame lo invertimos 90º y lo guardamos
@@ -71,33 +67,11 @@ while True:
         m = cv2.getRotationMatrix2D(((cols-1)/2.0, (rows-1)/2.0), 90, 1)
         frame = cv2.warpAffine(frame, m, (cols, rows))
         # Corrige distorsión por ojo de pez
-        #calcula mapas que resuelve la distorsión y rectifica con remap()
-        map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, DIM,  cv2.CV_16SC2)
-        #transforma la imagen a quitar efecto ojo de pez
-        frame = cv2.remap(frame, map1, map2, interpolation=cv2.INTER_LINEAR,  borderMode=cv2.BORDER_CONSTANT)
+        frame = ud.undistort_image(frame)
         # *** Hasta aquí preprocesamiento por el MASHI
         
         #invierte la imagen con respecto al eje vertical
         frame=cv2.flip(frame,1,0)
-        
-        #aumentamos el brillo sin desbordar
-        #frame= np.where((255-frame)<230, 255, frame*2)     #método 1
-        #gamma=2.0
-        #table=np.array([( (i/255.0) ** (1.0/gamma) ) * 255
-        #    for i in np.arange(0, 256) ]).astype("uint8")
-        #frame=cv2.LUT(frame,table)
-        #brightness=32                  #método 2
-        #shadow=brightness
-        #highlight=255
-        #alpha=(highlight-shadow)/255
-        #gamma=shadow
-        #frame=cv2.addWeighted(frame, alpha, frame, 0, gamma)
-        
-        #aumentamos el contraste
-        #contrast=32
-        #alpha = 131*(contrast + 127)/(127*(131-contrast))
-        #gamma = 127*(1-alpha)
-        #frame = cv2.addWeighted(frame, alpha, frame, 0, gamma)
         
         #redimensionar la imagen
         mini = cv2.resize(frame, (int(frame.shape[1] / size), int(frame.shape[0] / size)))
