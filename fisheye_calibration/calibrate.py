@@ -30,7 +30,12 @@ imgpoints = [] # 2d points in image plane.
 cont =0
 images = glob.glob('*.jpg')
 for fname in images:
+    
     img = cv2.imread(fname)
+    rows, cols = img.shape[:-1]
+    # rota la imagen 90ª en sentido antihoraio
+    m = cv2.getRotationMatrix2D(((cols-1)/2.0, (rows-1)/2.0), 90, 1)
+    img = cv2.warpAffine(img, m, (cols, rows))
     if _img_shape == None:
 		_img_shape = img.shape[:2]
     else:
